@@ -57,6 +57,7 @@ class App {
     this.app.use('/tokens/', tokenRoutes);
     this.app.use('/alunos/', alunoRoutes);
     this.app.use('/fotos/', fotoRoutes);
+    docsController.setup(this.app);
   }
 
   errorHandlers() {

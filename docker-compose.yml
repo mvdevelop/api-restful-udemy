@@ -1,0 +1,86 @@
+services:
+  # ========================================
+  # Banco de dados MariaDB
+  # ========================================
+  database:
+    image: mariadb:10.11
+    container_name: api-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpassword
+      MARIADB_DATABASE: api_restful
+      MARIADB_USER: api_user
+      MARIADB_PASSWORD: api_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - api-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 30s
+      timeout: 10s
+      retries: 5
+
+  # ========================================
+  # Adminer - Interface web para o banco
+  # ========================================
+  adminer:
+    image: adminer:4.8.1
+    container_name: api-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - api-network
+
+  # ========================================
+  # API Node.js
+  # ========================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: api-restful
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      APP_PORT: 3001
+      APP_URL: http://localhost:3001
+      DATABASE_HOST: database
+      DATABASE_PORT: 3306
+      DATABASE_USERNAME: api_user
+      DATABASE_PASSWORD: api_password
+      DATABASE: api_restful
+      TOKEN_SECRET: supersecretkey-change-in-production
+      TOKEN_EXPIRATION: 7d
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./src:/app/src
+      - ./uploads:/app/uploads
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - api-network
+
+  # ========================================
+  # Volumes persistentes
+  # ========================================
+volumes:
+  mariadb_data:
+    driver: local
+
+  # ========================================
+  # Rede interna
+  # ========================================
+networks:
+  api-network:
+    driver: bridge
