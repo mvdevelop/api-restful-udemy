@@ -1,3 +1,6 @@
+import eslint from '@eslint/js';
+import globals from 'globals';
+
 export default [
   {
     files: ['**/*.js'],
@@ -5,18 +8,18 @@ export default [
       ecmaVersion: 2024,
       sourceType: 'module',
       globals: {
-        ...globalThis.globals,
+        ...globals.node,
       },
     },
     rules: {
+      ...eslint.configs.recommended.rules,
       'no-console': 'off',
-      'class-methods-use-this': 'off',
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'prefer-const': 'error',
       'no-var': 'error',
-      'prefer-arrow-callback': 'error',
     },
   },
   {
-    ignores: ['dist/', 'node_modules/', 'uploads/'],
+    ignores: ['dist/**', 'node_modules/**', 'uploads/**'],
   },
 ];

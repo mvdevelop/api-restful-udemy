@@ -1,19 +1,14 @@
-
 import { Router } from 'express';
-import userController from '../controllers/UserController';
 
+import userController from '../controllers/UserController';
 import loginRequired from '../middlewares/loginRequired';
+import validate from '../middlewares/validate';
+import { userCreateSchema, userUpdateSchema } from '../validators/userValidators';
 
 const router = new Router();
 
-// Falhas de segurança
-//router.get('/', userController.index); // Lista usuários
-//router.get('/:id', userController.show); // Lista usuário
-
-// router.post('/', userController.store); // open
-
-router.post('/', userController.store);
-router.put('/', loginRequired, userController.update);
+router.post('/', validate({ body: userCreateSchema }), userController.store);
+router.put('/', loginRequired, validate({ body: userUpdateSchema }), userController.update);
 router.delete('/', loginRequired, userController.delete);
 
 export default router;

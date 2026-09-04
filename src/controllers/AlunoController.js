@@ -1,44 +1,39 @@
-
 import Aluno from '../models/Aluno';
 import Foto from '../models/Foto';
+import AppError from '../utils/AppError';
 
 class AlunoController {
-  async index(req, res) {
-    const alunos =  await Aluno.findAll({
-      attributes: ['id', 'nome', 'sobrenome', 'email', 'idade', 'peso', 'altura' ],
-      order: [['id', 'DESC'], [Foto, 'id', 'DESC']],
-      include: {
-        model: Foto,
-        attributes: ['url', 'filename'],
-      },
-    });
-    res.json(alunos);
-  }
-
-  async store(req, res) {
+  async index(req, res, next) {
     try {
-      const aluno = await Aluno.create(req.body);
-
-      return res.json('Aluno criado com sucesso!');
-    } catch (e) {
-      return res.status(400).json({
-        errors: e.errors.map(err => err.messages),
+      const alunos = await Aluno.findAll({
+        attributes: ['id', 'nome', 'sobrenome', 'email', 'idade', 'peso', 'altura'],
+        order: [['id', 'DESC'], [Foto, 'id', 'DESC']],
+        include: {
+          model: Foto,
+          attributes: ['url', 'filename'],
+        },
       });
+      return res.json(alunos);
+    } catch (err) {
+      return next(err);
     }
   }
 
-  async show(req, res) {
+  async store(req, res, next) {
     try {
-      const { id } =  req.params;
+      const aluno = await Aluno.create(req.body);
+      return res.status(201).json({ message: 'Aluno criado com sucesso!', data: aluno });
+    } catch (err) {
+      return next(err);
+    }
+  }
 
-      if(!id) {
-        return res.status(400).json({
-          errors: ['Faltando ID!'],
-        });
-      }
+  async show(req, res, next) {
+    try {
+      const { id } = req.params;
 
       const aluno = await Aluno.findByPk(id, {
-        attributes: ['id', 'nome', 'sobrenome', 'email', 'idade', 'peso', 'altura' ],
+        attributes: ['id', 'nome', 'sobrenome', 'email', 'idade', 'peso', 'altura'],
         order: [['id', 'DESC'], [Foto, 'id', 'DESC']],
         include: {
           model: Foto,
@@ -46,74 +41,48 @@ class AlunoController {
         },
       });
 
-      if(!aluno) {
-        return res.status(400).json({
-          errors: ['Aluno não existe!'],
-        });
+      if (!aluno) {
+        throw new AppError('Aluno não encontrado!', 404);
       }
 
       return res.json(aluno);
-    } catch (e) {
-      return res.status(400).json({
-        errors: e.errors.map(err => err.messages),
-      });
+    } catch (err) {
+      return next(err);
     }
   }
 
-  async delete(req, res) {
+  async delete(req, res, next) {
     try {
-      const { id } =  req.params;
-
-      if(!id) {
-        return res.status(400).json({
-          errors: ['Faltando ID!'],
-        });
-      }
+      const { id } = req.params;
 
       const aluno = await Aluno.findByPk(id);
 
-      if(!aluno) {
-        return res.status(400).json({
-          errors: ['Aluno não existe!'],
-        });
+      if (!aluno) {
+        throw new AppError('Aluno não encontrado!', 404);
       }
 
       await aluno.destroy();
-      return res.json({
-        apagado: true,
-      });
-    } catch (e) {
-      return res.status(400).json({
-        errors: e.errors.map(err => err.messages),
-      });
+      return res.json({ message: 'Aluno deletado com sucesso!', apagado: true });
+    } catch (err) {
+      return next(err);
     }
   }
 
-  async update(req, res) {
+  async update(req, res, next) {
     try {
-      const { id } =  req.params;
-
-      if(!id) {
-        return res.status(400).json({
-          errors: ['Faltando ID!'],
-        });
-      }
+      const { id } = req.params;
 
       const aluno = await Aluno.findByPk(id);
 
-      if(!aluno) {
-        return res.status(400).json({
-          errors: ['Aluno não existe!'],
-        });
+      if (!aluno) {
+        throw new AppError('Aluno não encontrado!', 404);
       }
 
       const alunoAtualizado = await aluno.update(req.body);
 
       return res.json(alunoAtualizado);
-    } catch (e) {
-      return res.status(400).json({
-        errors: e.errors.map(err => err.messages),
-      });
+    } catch (err) {
+      return next(err);
     }
   }
 }

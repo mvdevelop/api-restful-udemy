@@ -1,8 +1,5 @@
-
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import { resolve } from 'path';
-
-dotenv.config();
 
 import './database';
 
@@ -16,6 +13,8 @@ import tokenRoutes from './routes/tokenRoutes';
 import alunoRoutes from './routes/alunoRoutes';
 import fotoRoutes from './routes/fotoRoutes';
 
+import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
+
 const whiteList = [
   'http://react02.192.168.1.6',
   'http://localhost:3000',
@@ -24,13 +23,13 @@ const whiteList = [
 ];
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    if(whiteList.indexOf(origin) !== -1 || !origin) {
+  origin(origin, callback) {
+    if (whiteList.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
-  }
+  },
 };
 
 class App {
@@ -38,15 +37,15 @@ class App {
     this.app = express();
     this.middlewares();
     this.routes();
+    this.errorHandlers();
   }
 
   middlewares() {
-    // cors(corsOptions)
-    this.app.use(cors());
+    this.app.use(cors(corsOptions));
     this.app.use(helmet());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.json());
-    this.app.use('/images/',express.static(resolve(__dirname, '..', 'uploads', 'images')));
+    this.app.use('/images/', express.static(resolve(__dirname, '..', 'uploads', 'images')));
   }
 
   routes() {
@@ -55,6 +54,13 @@ class App {
     this.app.use('/tokens/', tokenRoutes);
     this.app.use('/alunos/', alunoRoutes);
     this.app.use('/fotos/', fotoRoutes);
+  }
+
+  errorHandlers() {
+    // Handler para rotas não encontradas (404)
+    this.app.use(notFoundHandler);
+    // Handler global de erros (deve ser o último)
+    this.app.use(errorHandler);
   }
 }
 

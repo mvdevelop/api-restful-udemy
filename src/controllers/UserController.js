@@ -1,86 +1,75 @@
-
 import User from '../models/User';
+import AppError from '../utils/AppError';
 
 class UserController {
-  async store(req, res) {
+  async store(req, res, next) {
     try {
       const novoUser = await User.create(req.body);
       const { id, nome, email } = novoUser;
 
-      return res.json({ id, nome, email });
-    } catch (e) {
-      return res.status(400).json({
-        errors: e.errors.map((err) => err.message),
-      });
+      return res.status(201).json({ id, nome, email });
+    } catch (err) {
+      return next(err);
     }
   }
 
-  // Index
-  async index(req, res) {
+  async index(req, res, next) {
     try {
       const users = await User.findAll({ attributes: ['id', 'nome', 'email'] });
       return res.json(users);
-    } catch (e) {
-      return res.json(null);
+    } catch (err) {
+      return next(err);
     }
   }
 
-  // Show
-  async show(req, res) {
+  async show(req, res, next) {
     try {
       const user = await User.findByPk(req.params.id);
+
+      if (!user) {
+        throw new AppError('Usuário não encontrado!', 404);
+      }
 
       const { id, nome, email } = user;
 
       return res.json({ id, nome, email });
-    } catch (e) {
-      return res.json(null);
+    } catch (err) {
+      return next(err);
     }
   }
 
-  // Update
-  async update(req, res) {
+  async update(req, res, next) {
     try {
       const user = await User.findByPk(req.userId);
 
-      if(!user) {
-        return res.status(400).json({
-          errors: ['Usuário não existe.'],
-        });
+      if (!user) {
+        throw new AppError('Usuário não encontrado!', 404);
       }
 
       const novosDados = await user.update(req.body);
       const { id, nome, email } = novosDados;
 
       return res.json({ id, nome, email });
-    } catch (e) {
-      return res.status(400).json({
-        errors: e.errors.map((err) => err.message),
-      });
+    } catch (err) {
+      return next(err);
     }
   }
 
-  // Delete
-  async delete(req, res) {
+  async delete(req, res, next) {
     try {
       const user = await User.findByPk(req.userId);
 
-      if(!user) {
-        return res.status(400).json({
-          errors: ['Usuário não existe.'],
-        });
+      if (!user) {
+        throw new AppError('Usuário não encontrado!', 404);
       }
 
       await user.destroy();
 
-      return res.json(`Usuário ${user.email} deletado!`);
-    } catch (e) {
-      return res.status(400).json({
-        errors: e.errors.map((err) => err.message),
-      });
+      return res.json({ message: `Usuário ${user.email} deletado!` });
+    } catch (err) {
+      return next(err);
     }
   }
-
 }
 
 export default new UserController();

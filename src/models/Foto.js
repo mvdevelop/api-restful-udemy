@@ -1,6 +1,5 @@
 
 import Sequelize, { Model } from "sequelize";
-import appConfig from '../config/appConfig';
 
 export default class Foto extends Model {
   static init(sequelize) {
