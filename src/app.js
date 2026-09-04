@@ -12,7 +12,9 @@ import userRoutes from './routes/userRoutes';
 import tokenRoutes from './routes/tokenRoutes';
 import alunoRoutes from './routes/alunoRoutes';
 import fotoRoutes from './routes/fotoRoutes';
+import docsController from './controllers/DocsController';
 
+import requestLogger from './middlewares/requestLogger';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
 
 const whiteList = [
@@ -45,6 +47,7 @@ class App {
     this.app.use(helmet());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.json());
+    this.app.use(requestLogger);
     this.app.use('/images/', express.static(resolve(__dirname, '..', 'uploads', 'images')));
   }
 
