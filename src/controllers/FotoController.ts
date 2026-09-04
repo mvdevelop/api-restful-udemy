@@ -5,6 +5,7 @@ import multerConfig from '../config/multerConfig.js';
 import Foto from '../models/Foto.js';
 
 const upload = multer(multerConfig).single('foto');
+const FotoModel = Foto as any;
 
 class FotoController {
   store(req: Request, res: Response): void {
@@ -26,7 +27,7 @@ class FotoController {
 
         const { originalname, filename } = req.file;
         const { aluno_id } = req.body;
-        const foto = await Foto.create({
+        const foto = await FotoModel.create({
           originalname,
           filename,
           aluno_id: Number(aluno_id),

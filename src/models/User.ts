@@ -10,7 +10,7 @@ class User extends Model {
   public readonly created_at!: Date;
   public readonly updated_at!: Date;
 
-  static init(sequelize: Sequelize): typeof User {
+  static init(sequelize: any): any {
     super.init(
       {
         id: {
@@ -21,17 +21,11 @@ class User extends Model {
         nome: {
           type: DataTypes.STRING,
           defaultValue: '',
-          validate: {
-            len: [3, 255],
-          },
         },
         email: {
           type: DataTypes.STRING,
           defaultValue: '',
           unique: true,
-          validate: {
-            isEmail: true,
-          },
         },
         password_hash: {
           type: DataTypes.STRING,
@@ -40,9 +34,6 @@ class User extends Model {
         password: {
           type: DataTypes.VIRTUAL,
           defaultValue: '',
-          validate: {
-            len: [6, 50],
-          },
         },
       },
       {
@@ -51,7 +42,7 @@ class User extends Model {
       },
     );
 
-    this.addHook('beforeSave', async (user: User) => {
+    this.addHook('beforeSave', async (user: any) => {
       if (user.password) {
         user.password_hash = await bcrypt.hash(user.password, 8);
       }

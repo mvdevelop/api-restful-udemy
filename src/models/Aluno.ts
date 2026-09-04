@@ -11,7 +11,7 @@ class Aluno extends Model {
   public readonly created_at!: Date;
   public readonly updated_at!: Date;
 
-  static init(sequelize: Sequelize): typeof Aluno {
+  static init(sequelize: any): any {
     super.init(
       {
         id: {

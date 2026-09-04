@@ -5,7 +5,7 @@ import loginRequired from '../middlewares/loginRequired.js';
 import validate from '../middlewares/validate.js';
 import { userCreateSchema, userUpdateSchema } from '../validators/userValidators.js';
 
-const router = new Router();
+const router = Router();
 
 router.post('/', validate({ body: userCreateSchema }), userController.store);
 router.put('/', loginRequired, validate({ body: userUpdateSchema }), userController.update);

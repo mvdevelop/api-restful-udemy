@@ -7,7 +7,7 @@ class Foto extends Model {
   public aluno_id!: number;
   public readonly url!: string;
 
-  static init(sequelize: Sequelize): typeof Foto {
+  static init(sequelize: any): any {
     super.init(
       {
         id: {

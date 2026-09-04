@@ -5,11 +5,11 @@ import Aluno from '../models/Aluno.js';
 import User from '../models/User.js';
 import Foto from '../models/Foto.js';
 
-const models = [Aluno, User, Foto];
+const models: any[] = [Aluno, User, Foto];
 
-const connection = new Sequelize(databaseConfig);
+const connection: any = new Sequelize(databaseConfig as any);
 
 models.forEach((model) => model.init(connection));
-models.forEach((model) => model.associate && model.associate(connection.models as any));
+models.forEach((model) => model.associate && model.associate(connection.models));
 
 export default connection;

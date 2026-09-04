@@ -3,10 +3,12 @@ import { Request, Response, NextFunction } from 'express';
 import User from '../models/User.js';
 import AppError from '../utils/AppError.js';
 
+const UserModel = User as any;
+
 class UserController {
   async store(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const novoUser = await User.create(req.body);
+      const novoUser = await UserModel.create(req.body);
       const { id, nome, email } = novoUser;
 
       res.status(201).json({ id, nome, email });
@@ -17,7 +19,7 @@ class UserController {
 
   async index(_req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const users = await User.findAll({ attributes: ['id', 'nome', 'email'] });
+      const users = await UserModel.findAll({ attributes: ['id', 'nome', 'email'] });
       res.json(users);
     } catch (err) {
       next(err);
@@ -26,7 +28,7 @@ class UserController {
 
   async show(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const user = await User.findByPk(req.params.id);
+      const user = await UserModel.findByPk(req.params.id);
 
       if (!user) {
         throw new AppError('Usuário não encontrado!', 404);
@@ -42,7 +44,7 @@ class UserController {
 
   async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const user = await User.findByPk(req.userId);
+      const user = await UserModel.findByPk(req.userId);
 
       if (!user) {
         throw new AppError('Usuário não encontrado!', 404);
@@ -59,7 +61,7 @@ class UserController {
 
   async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const user = await User.findByPk(req.userId);
+      const user = await UserModel.findByPk(req.userId);
 
       if (!user) {
         throw new AppError('Usuário não encontrado!', 404);

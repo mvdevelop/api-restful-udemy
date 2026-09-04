@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 
 import healthController from '../controllers/HealthController.js';
 
-const router = new Router();
+const router = Router();
 
 router.get('/health', (req: Request, res: Response, next) => {
   healthController.index(req, res).catch(next);

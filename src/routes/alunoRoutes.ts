@@ -5,7 +5,7 @@ import loginRequired from '../middlewares/loginRequired.js';
 import validate from '../middlewares/validate.js';
 import { alunoCreateSchema, alunoUpdateSchema, idParamSchema } from '../validators/alunoValidators.js';
 
-const router = new Router();
+const router = Router();
 
 router.get('/', alunoController.index);
 router.post('/', loginRequired, validate({ body: alunoCreateSchema }), alunoController.store);
